@@ -16,11 +16,6 @@ class User(AbstractUser):
     first_name = models.CharField("Имя", max_length=150)
     last_name = models.CharField("Фамилия", max_length=150)
     password = models.CharField("Пароль", max_length=150)
-    confirmation_code = models.CharField(
-        max_length=100,
-        blank=True,
-        verbose_name='Код подтверждения',
-    )
     created = models.DateTimeField(
         'Дата создания пользователя', auto_now_add=True)
 
@@ -34,3 +29,7 @@ class User(AbstractUser):
     @property
     def is_user(self):
         return self.role == User.USER
+
+    @property
+    def recipes_count(self):
+        return self.recipes.count()

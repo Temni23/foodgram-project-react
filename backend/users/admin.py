@@ -4,11 +4,10 @@ from .models import User
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("id", "email", "username", "first_name", "last_name")
-    list_editable = ("email", "username", "first_name", "last_name")
-    search_fields = ("id", "email", "username", "first_name", "last_name")
-    list_filter = ("id", "email", "username", "first_name", "last_name")
-    empty_value_display = "-пусто-"
+    list_display = ('id', 'email', 'username', 'first_name', 'last_name')
+    list_editable = ('email', 'username', 'first_name', 'last_name')
+    search_fields = ('id', 'email', 'username', 'first_name', 'last_name')
+    empty_value_display = '-пусто-'
 
 
 admin.site.register(User, UserAdmin)
