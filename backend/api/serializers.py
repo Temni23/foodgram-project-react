@@ -217,7 +217,7 @@ class CheckFollowSerializer(serializers.ModelSerializer):
         return obj
 
 
-class RecipeCToFollowSerializer(serializers.ModelSerializer):
+class RecipeShortSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=True, allow_null=False,)
 
     class Meta:
@@ -228,7 +228,7 @@ class RecipeCToFollowSerializer(serializers.ModelSerializer):
 class AuthorSerializer(serializers.ModelSerializer):
     """Сериалайзер используется в функции подписки на автора."""
     is_subscribed = serializers.SerializerMethodField()
-    recipes = RecipeCToFollowSerializer(read_only=True, many=True)
+    recipes = RecipeShortSerializer(read_only=True, many=True)
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:

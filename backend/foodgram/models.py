@@ -73,8 +73,36 @@ class Follow(models.Model):
                                   verbose_name="Автор"
                                   )
 
+    class Meta:
+        unique_together = ("user", "following",)
+
     def __str__(self):
         return f"{self.user} подписан на {self.following}"
 
-    # class Meta:
-    #     unique_together = ("user", "following",)
+
+class FavoriteRecipe(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name="favorite_recipes",
+                             verbose_name="Пользователь"
+                             )
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
+                               related_name="recipe_favorites",
+                               verbose_name="Рецепт"
+                               )
+
+    def __str__(self):
+        return f"{self.user} добавил в избранное рецепт {self.recipe}"
+
+
+class ShoppingCart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name="cart_recipes",
+                             verbose_name="Пользователь"
+                             )
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
+                               related_name="recipe_cart",
+                               verbose_name="Рецепт"
+                               )
+
+    def __str__(self):
+        return f"{self.user} добавил в корзину рецепт {self.recipe}"

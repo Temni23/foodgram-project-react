@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Tag, Ingredient, Recipe, RecipeIngredient, Follow
+from .models import Tag, Ingredient, Recipe, RecipeIngredient, Follow, FavoriteRecipe
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -40,7 +40,12 @@ class FollowAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'following')
 
 
+class FavoriteRecipeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'recipe')
+
+
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Follow, FollowAdmin)
+admin.site.register(FavoriteRecipe, FavoriteRecipeAdmin)

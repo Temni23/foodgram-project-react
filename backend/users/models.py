@@ -19,6 +19,9 @@ class User(AbstractUser):
     created = models.DateTimeField(
         'Дата создания пользователя', auto_now_add=True)
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self):
         return self.username
 

@@ -2,18 +2,21 @@ from http import HTTPStatus
 
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, serializers
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from foodgram.models import Ingredient, Tag, Recipe, Follow
+from foodgram.models import Ingredient, Tag, Recipe, Follow, FavoriteRecipe, \
+    ShoppingCart
 from users.models import User
 from .serializers import (UserSerializer, MeSerializer, IngredientSerializer,
                           TagSerializer, RecipeSerializer,
                           RecipeCreateSerializer,
-                          FollowSerializer, CheckFollowSerializer, AuthorSerializer)
+                          CheckFollowSerializer, AuthorSerializer,
+                          RecipeShortSerializer)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -136,12 +139,98 @@ class FollowViewSet(viewsets.ViewSet):
         return Response(status=HTTPStatus.NO_CONTENT)
 
     @action(detail=False, permission_classes=(IsAuthenticated,))
-    def subscriptions(self, request):
+    def follows_list(self, request):
         """Подписки."""
         user = request.user
-        queryset = user.follows.all()
-        pages = self.paginate_queryset(queryset)
-        serializer = AuthorSerializer(
-            pages, many=True, context={"request": request}
-        )
-        return self.get_paginated_response(serializer.data)
+        queryset = User.objects.filter(following__user=user)
+
+        paginator = PageNumberPagination()
+        paginated_queryset = paginator.paginate_queryset(queryset, request)
+
+        serializer = AuthorSerializer(paginated_queryset, many=True,
+                                      context={"request": request})
+        return paginator.get_paginated_response(serializer.data)
+
+
+class FavoriteViewSet(viewsets.ViewSet):
+    """Вьюсет для избранного."""
+
+    @action(
+        methods=["POST"], detail=True, permission_classes=(IsAuthenticated,)
+    )
+    @transaction.atomic()
+    def create(self, request, id=None):
+        """Добавить в избранное рецепт."""
+        user = request.user
+        try:
+            recipe = Recipe.objects.get(pk=id)
+        except Recipe.DoesNotExist:
+            raise serializers.ValidationError(
+                "Рецепта не существует"
+            )
+        if FavoriteRecipe.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError(
+                "Рецепт уже в избранном"
+            )
+        FavoriteRecipe.objects.create(user=user, recipe=recipe)
+        serializer = RecipeShortSerializer(recipe, context={"request": request})
+        return Response(serializer.data, status=HTTPStatus.CREATED, exception=True)
+
+    @transaction.atomic()
+    def destroy(self, request, id=None):
+        """Удалить из избранного рецепт."""
+        user = request.user
+        try:
+            recipe = Recipe.objects.get(pk=id)
+        except Recipe.DoesNotExist:
+            raise serializers.ValidationError(
+                "Рецепта не существует"
+            )
+        if not FavoriteRecipe.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError(
+                "Рецепт не добавлен в избранное"
+            )
+        FavoriteRecipe.objects.filter(user=user, recipe=recipe).delete()
+        return Response(status=HTTPStatus.NO_CONTENT, exception=True)
+
+
+class ShoppingCartViewSet(viewsets.ViewSet):
+    """Вьюсет для корзины."""
+
+    @action(
+        methods=["POST"], detail=True, permission_classes=(IsAuthenticated,)
+    )
+    @transaction.atomic()
+    def create(self, request, id=None):
+        """Добавить в корзину рецепт."""
+        user = request.user
+        try:
+            recipe = Recipe.objects.get(pk=id)
+        except Recipe.DoesNotExist:
+            raise serializers.ValidationError(
+                "Рецепта не существует"
+            )
+        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError(
+                "Рецепт уже в корзине"
+            )
+        ShoppingCart.objects.create(user=user, recipe=recipe)
+        serializer = RecipeShortSerializer(recipe, context={"request": request})
+        return Response(serializer.data, status=HTTPStatus.CREATED, exception=True)
+
+    @transaction.atomic()
+    def destroy(self, request, id=None):
+        """Удалить из корзины рецепт."""
+        user = request.user
+        try:
+            recipe = Recipe.objects.get(pk=id)
+        except Recipe.DoesNotExist:
+            raise serializers.ValidationError(
+                "Рецепта не существует"
+            )
+        if not ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError(
+                "Рецепт не добавлен в корзину"
+            )
+        ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
+        return Response(status=HTTPStatus.NO_CONTENT, exception=True)
