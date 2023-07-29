@@ -23,7 +23,7 @@ urlpatterns = [
                                   }), name='favorite'),
     path('recipes/<id>/shopping_cart/',
          ShoppingCartViewSet.as_view({'post': 'create', 'delete': 'destroy'
-                                  }), name='shopping_cart'),
+                                      }), name='shopping_cart'),
     path('auth/', include('djoser.urls.authtoken')),
     path('', include(router.urls)),
 

@@ -22,7 +22,7 @@ from .serializers import (UserSerializer, MeSerializer, IngredientSerializer,
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    lookup_field = 'username'
+    lookup_field = 'id'
     # permission_classes = (IsAdminOrSuperuser,)
     filter_backends = (SearchFilter, OrderingFilter)
     ordering_fields = ('username', 'email')

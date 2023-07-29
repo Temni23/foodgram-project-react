@@ -55,6 +55,12 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
+    def is_in_shopping_cart(self, user):
+        return self.recipe_cart.filter(user=user).exists()
+
+    def is_favorited(self, user):
+        return self.recipe_favorites.filter(user=user).exists()
+
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, related_name='recipe_ingredients',
@@ -65,44 +71,56 @@ class RecipeIngredient(models.Model):
 
 class Follow(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             related_name="follows",
-                             verbose_name="Подписчик"
+                             related_name='follows',
+                             verbose_name='Подписчик'
                              )
     following = models.ForeignKey(User, on_delete=models.CASCADE,
-                                  related_name="following",
-                                  verbose_name="Автор"
+                                  related_name='following',
+                                  verbose_name='Автор'
                                   )
 
     class Meta:
-        unique_together = ("user", "following",)
+        ordering = ['id']
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
 
     def __str__(self):
-        return f"{self.user} подписан на {self.following}"
+        return f'{self.user} подписан на {self.following}'
 
 
 class FavoriteRecipe(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             related_name="favorite_recipes",
-                             verbose_name="Пользователь"
+                             related_name='favorite_recipes',
+                             verbose_name='Пользователь'
                              )
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
-                               related_name="recipe_favorites",
-                               verbose_name="Рецепт"
+                               related_name='recipe_favorites',
+                               verbose_name='Рецепт'
                                )
 
+    class Meta:
+        ordering = ['id']
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
+
     def __str__(self):
-        return f"{self.user} добавил в избранное рецепт {self.recipe}"
+        return f'{self.user} добавил в избранное рецепт {self.recipe}'
 
 
 class ShoppingCart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             related_name="cart_recipes",
-                             verbose_name="Пользователь"
+                             related_name='cart_recipes',
+                             verbose_name='Пользователь'
                              )
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
-                               related_name="recipe_cart",
-                               verbose_name="Рецепт"
+                               related_name='recipe_cart',
+                               verbose_name='Рецепт'
                                )
 
+    class Meta:
+        ordering = ['id']
+        verbose_name = 'Рецепт из корзины'
+        verbose_name_plural = 'Рецепты из корзины'
+
     def __str__(self):
-        return f"{self.user} добавил в корзину рецепт {self.recipe}"
+        return f'{self.user} добавил в корзину рецепт {self.recipe}'
