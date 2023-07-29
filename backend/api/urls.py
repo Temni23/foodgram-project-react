@@ -13,7 +13,7 @@ router.register(r'tags', TagViewSet, basename='tags')
 router.register(r'recipes', RecipeViewSet, basename='recipes')
 
 urlpatterns = [
-    path('users/subscribes/',
+    path('users/subscriptions/',
          FollowViewSet.as_view({'get': 'follows_list'}), name='follows_list'),
     path('users/<id>/subscribe/',
          FollowViewSet.as_view({'post': 'create',

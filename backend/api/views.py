@@ -9,8 +9,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from foodgram.models import Ingredient, Tag, Recipe, Follow, FavoriteRecipe, \
-    ShoppingCart
+from foodgram.models import (Ingredient, Tag, Recipe, Follow, FavoriteRecipe,
+                             ShoppingCart)
 from users.models import User
 from .serializers import (UserSerializer, MeSerializer, IngredientSerializer,
                           TagSerializer, RecipeSerializer,
@@ -66,8 +66,9 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     # permission_classes = (IsAdminOrReadOnly,)
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    # filter_backends = (IngredientSearchFilter,)
-    # search_fields = ('^name',)
+    pagination_class = None
+    filter_backends = (SearchFilter,)
+    search_fields = ('^name',)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
