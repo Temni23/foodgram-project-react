@@ -18,13 +18,13 @@ urlpatterns = [
          name='download_shopping_cart'),
     path('users/subscriptions/',
          FollowViewSet.as_view({'get': 'follows_list'}), name='follows_list'),
-    path('users/<id>/subscribe/',
+    path('users/<int:id>/subscribe/',
          FollowViewSet.as_view({'post': 'create',
                                 'delete': 'destroy'}), name='follow'),
-    path('recipes/<id>/favorite/',
+    path('recipes/<int:id>/favorite/',
          FavoriteViewSet.as_view({'post': 'create', 'delete': 'destroy'
                                   }), name='favorite'),
-    path('recipes/<id>/shopping_cart/',
+    path('recipes/<int:id>/shopping_cart/',
          ShoppingCartViewSet.as_view({'post': 'create', 'delete': 'destroy'
                                       }), name='shopping_cart'),
     path('auth/', include('djoser.urls.authtoken')),

@@ -5,6 +5,7 @@ from django.db import transaction
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status, serializers
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -14,6 +15,7 @@ from rest_framework.response import Response
 
 from foodgram.models import (Ingredient, Tag, Recipe, Follow, FavoriteRecipe,
                              ShoppingCart, RecipeIngredient)
+from api.custom_filters import RecipeFilter
 from users.models import User
 from .serializers import (UserSerializer, MeSerializer, IngredientSerializer,
                           TagSerializer, RecipeSerializer,
@@ -83,6 +85,8 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
     http_method_names = ['get', 'post', 'patch', 'delete', ]
 
     def get_queryset(self):
