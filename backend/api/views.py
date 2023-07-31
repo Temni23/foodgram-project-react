@@ -100,14 +100,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 class FollowViewSet(viewsets.ViewSet):
-    '''Вьюсет для подписок.'''
+    """Вьюсет для подписок."""
 
     @action(
         methods=['POST'], detail=True, permission_classes=(IsAuthenticated,)
     )
     @transaction.atomic()
     def create(self, request, id=None):
-        '''Подписаться на автора.'''
+        """Подписаться на автора."""
         user = request.user
         following = get_object_or_404(User, pk=id)
         data = {
@@ -126,7 +126,7 @@ class FollowViewSet(viewsets.ViewSet):
     @action(detail=True, methods=['DELETE'], permission_classes=[IsAuthenticated])
     @transaction.atomic()
     def destroy(self, request, id=None):
-        '''Отписка'''
+        """Отписка"""
         user = request.user
         following = get_object_or_404(User, pk=id)
         data = {
@@ -144,7 +144,7 @@ class FollowViewSet(viewsets.ViewSet):
 
     @action(detail=False, permission_classes=(IsAuthenticated,))
     def follows_list(self, request):
-        '''Подписки.'''
+        """Подписки."""
         user = request.user
         queryset = User.objects.filter(following__user=user)
 
@@ -157,14 +157,14 @@ class FollowViewSet(viewsets.ViewSet):
 
 
 class FavoriteViewSet(viewsets.ViewSet):
-    '''Вьюсет для избранного.'''
+    """Вьюсет для избранного."""
 
     @action(
         methods=['POST'], detail=True, permission_classes=(IsAuthenticated,)
     )
     @transaction.atomic()
     def create(self, request, id=None):
-        '''Добавить в избранное рецепт.'''
+        """Добавить в избранное рецепт."""
         user = request.user
         try:
             recipe = Recipe.objects.get(pk=id)
@@ -182,7 +182,7 @@ class FavoriteViewSet(viewsets.ViewSet):
 
     @transaction.atomic()
     def destroy(self, request, id=None):
-        '''Удалить из избранного рецепт.'''
+        """Удалить из избранного рецепт."""
         user = request.user
         try:
             recipe = Recipe.objects.get(pk=id)
@@ -199,14 +199,14 @@ class FavoriteViewSet(viewsets.ViewSet):
 
 
 class ShoppingCartViewSet(viewsets.ViewSet):
-    '''Вьюсет для корзины.'''
+    """Вьюсет для корзины."""
 
     @action(
         methods=['POST'], detail=True, permission_classes=(IsAuthenticated,)
     )
     @transaction.atomic()
     def create(self, request, id=None):
-        '''Добавить в корзину рецепт.'''
+        """Добавить в корзину рецепт."""
         user = request.user
         try:
             recipe = Recipe.objects.get(pk=id)
@@ -224,7 +224,7 @@ class ShoppingCartViewSet(viewsets.ViewSet):
 
     @transaction.atomic()
     def destroy(self, request, id=None):
-        '''Удалить из корзины рецепт.'''
+        """Удалить из корзины рецепт."""
         user = request.user
         try:
             recipe = Recipe.objects.get(pk=id)
@@ -244,6 +244,7 @@ class ShoppingCartViewSet(viewsets.ViewSet):
         detail=False,
         permission_classes=(IsAuthenticated,))
 def download_shopping_cart(request):
+    """Функция формирует список покупок"""
     user = request.user
     cart_recipes = user.cart_recipes.all()
     recipes_names = ', '.join([cart_recipe.recipe.name for cart_recipe in cart_recipes])
