@@ -46,9 +46,10 @@ class Recipe(models.Model):
     image = models.ImageField('Изображение', upload_to='recipes/images/', )
     text = models.TextField(verbose_name='Описание рецепта')
     cooking_time = models.PositiveIntegerField(verbose_name='Время приготовления', )
+    pub_date = models.DateTimeField('Дата создания рецепта', auto_now_add=True)
 
     class Meta:
-        ordering = ['-name']
+        ordering = ['pub_date']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
@@ -67,6 +68,10 @@ class RecipeIngredient(models.Model):
                                on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     amount = models.PositiveIntegerField(verbose_name='Количество')
+
+    def __str__(self):
+        return (f'Ингредиент {self.ingredient} '
+                f'в количестве {self.amount} {self.ingredient.measurement_unit}')
 
 
 class Follow(models.Model):
