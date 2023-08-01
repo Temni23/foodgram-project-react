@@ -141,7 +141,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
-    """Сериалайзер используется для создания и обновления ингредиентов в рецепте"""
+    """Сериалайзер используется для создания и
+    обновления ингредиентов в рецепте"""
     id = serializers.IntegerField()
     amount = serializers.IntegerField()
 

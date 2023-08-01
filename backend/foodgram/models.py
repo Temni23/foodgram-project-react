@@ -79,7 +79,8 @@ class RecipeIngredient(models.Model):
 
     def __str__(self):
         return (f'Ингредиент {self.ingredient} '
-                f'в количестве {self.amount} {self.ingredient.measurement_unit}')
+                f'в количестве {self.amount} '
+                f'{self.ingredient.measurement_unit}')
 
 
 class Follow(models.Model):
