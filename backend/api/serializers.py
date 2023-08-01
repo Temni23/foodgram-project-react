@@ -1,5 +1,6 @@
 import base64
 
+from django.contrib.auth.hashers import make_password
 from django.core import validators
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
@@ -22,6 +23,23 @@ class Base64ImageField(serializers.ImageField):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    is_subscribed = serializers.SerializerMethodField()
+
+    class Meta:
+        fields = (
+            'email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed')
+        model = User
+
+    def get_is_subscribed(self, obj):
+        try:
+            user = self.context['request'].user
+        except KeyError:
+            return False
+        return obj.following.filter(user=user).exists()
+
+
+class UserCreateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(max_length=150, required=True,
                                      validators=(
                                          validators.MaxLengthValidator(150),
@@ -29,19 +47,13 @@ class UserSerializer(serializers.ModelSerializer):
                                              r'^[\w.@+-]+\Z')
                                      ))
     email = serializers.EmailField(max_length=254, required=True)
+    password = serializers.CharField(style={"input_type": "password"}, write_only=True)
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
-        fields = (
-            'email', 'id', 'username', 'first_name', 'last_name','is_subscribed')
         model = User
-
-    def validate_username(self, value):
-        if value == 'me':
-            raise serializers.ValidationError(
-                'Нельзя выбрать имя me!'
-            )
-        return value
+        fields = ('email', 'username', 'first_name', 'last_name',
+                  'password', 'is_subscribed')
 
     def validate(self, attrs):
         user = User.objects.filter(email=attrs.get('email'))
@@ -49,30 +61,18 @@ class UserSerializer(serializers.ModelSerializer):
             user = user.first()
             if user.username != attrs.get('username'):
                 raise serializers.ValidationError(
-                    {'Этот email уже используется другим пользователем'}
+                    {'Это имя пользователя уже используется'}
                 )
         user = User.objects.filter(username=attrs.get('username'))
         if user.exists():
             user = user.first()
             if user.email != attrs.get('email'):
                 raise serializers.ValidationError(
-                    {'Это имя пользователя уже используется'}
+                    {'Этот email уже используется другим пользователем'}
                 )
+        if attrs.get('password'):
+            attrs['password'] = make_password(attrs['password'])
         return super().validate(attrs)
-
-    def get_is_subscribed(self, obj):
-        user = self.context['request'].user
-        return obj.following.filter(user=user).exists()
-
-
-
-class MeSerializer(serializers.ModelSerializer):
-    is_subscribed = serializers.SerializerMethodField()
-    class Meta:
-        fields = (
-            'email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed')
-        model = User
-        read_only_fields = ('id',)
 
     def get_is_subscribed(self, obj):
         return False
@@ -115,8 +115,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
-        fields = ('id', 'tags', 'author', 'ingredients','is_favorited', 'is_in_shopping_cart',
-                  'name', 'image', 'text', 'cooking_time')
+        fields = (
+            'id', 'tags', 'author', 'ingredients', 'is_favorited',
+            'is_in_shopping_cart',
+            'name', 'image', 'text', 'cooking_time')
         model = Recipe
 
     def get_is_in_shopping_cart(self, obj):

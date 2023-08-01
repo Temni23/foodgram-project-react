@@ -21,20 +21,25 @@ class IngredientAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'measurement_unit')
     list_editable = ('name', 'measurement_unit')
     search_fields = ('name',)
-    list_filter = ('measurement_unit',)
+    list_filter = ('name', 'measurement_unit',)
     empty_value_display = '-пусто-'
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'author', 'name', 'image', 'text',
+    list_display = ('id', 'author', 'name', 'total_favorite', 'image', 'text',
                     'cooking_time',)
     list_editable = ('author', 'name', 'text',
                      'cooking_time',)
     search_fields = ('author', 'name', 'text',
                      'cooking_time',)
-    list_filter = ('author',)
+    list_filter = ('author', 'tags')
     inlines = (RecipeIngredientInline,)
     empty_value_display = '-пусто-'
+
+    def total_favorite(self, obj):
+        return obj.total_favorite
+
+    total_favorite.short_description = 'В избранном'
 
 
 class FollowAdmin(admin.ModelAdmin):

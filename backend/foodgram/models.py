@@ -39,7 +39,8 @@ class Tag(models.Model):
 
 class Recipe(models.Model):
     tags = models.ManyToManyField(Tag, related_name='tags', )
-    author = models.ForeignKey(User, related_name='recipes', on_delete=models.CASCADE)
+    author = models.ForeignKey(User, related_name='recipes', on_delete=models.CASCADE,
+                               verbose_name='Автор')
     ingredients = models.ManyToManyField(Ingredient, through='RecipeIngredient',
                                          related_name='ingredients')
     name = models.CharField('Название рецепта', max_length=200)
@@ -49,7 +50,7 @@ class Recipe(models.Model):
     pub_date = models.DateTimeField('Дата создания рецепта', auto_now_add=True)
 
     class Meta:
-        ordering = ['pub_date']
+        ordering = ['-pub_date']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
@@ -61,6 +62,10 @@ class Recipe(models.Model):
 
     def is_favorited(self, user):
         return self.recipe_favorites.filter(user=user).exists()
+
+    @property
+    def total_favorite(self):
+        return self.recipe_favorites.all().count()
 
 
 class RecipeIngredient(models.Model):
