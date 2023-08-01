@@ -3,9 +3,9 @@ import base64
 from django.contrib.auth.hashers import make_password
 from django.core import validators
 from django.core.files.base import ContentFile
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
+from api.custom_functions import add_ingredients
 from foodgram.models import Ingredient, Tag, Recipe, RecipeIngredient, Follow
 from users.models import User
 
@@ -155,16 +155,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        recipe_ingredients = []
-        for ingredient_data in ingredients:
-            ingredient = get_object_or_404(Ingredient, id=ingredient_data.get('id'))
-            recipe_ingredient = RecipeIngredient(
-                recipe=recipe,
-                ingredient=ingredient,
-                amount=ingredient_data['amount']
-            )
-            recipe_ingredients.append(recipe_ingredient)
-        RecipeIngredient.objects.bulk_create(recipe_ingredients)
+        add_ingredients(ingredients, recipe)
         return recipe
 
     def update(self, instance, validated_data):
@@ -172,16 +163,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         new_ingredients = validated_data.pop('ingredients')
         instance.tags.set(new_tags)
         RecipeIngredient.objects.filter(recipe=instance).delete()
-        new_recipe_ingredients = []
-        for ingredient_data in new_ingredients:
-            ingredient = get_object_or_404(Ingredient, id=ingredient_data.get('id'))
-            recipe_ingredient = RecipeIngredient(
-                recipe=instance,
-                ingredient=ingredient,
-                amount=ingredient_data['amount']
-            )
-            new_recipe_ingredients.append(recipe_ingredient)
-        RecipeIngredient.objects.bulk_create(new_recipe_ingredients)
+        add_ingredients(new_ingredients, instance)
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
