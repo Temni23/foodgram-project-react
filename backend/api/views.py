@@ -17,6 +17,7 @@ from api.custom_filters import RecipeFilter
 from foodgram.models import (Ingredient, Tag, Recipe, Follow, FavoriteRecipe,
                              ShoppingCart, RecipeIngredient)
 from users.models import User
+from .permissions import IsAdminOrSuperuserOrReadOnly, IsAuthorStaffOrReadOnly
 from .serializers import (IngredientSerializer,
                           TagSerializer, RecipeSerializer,
                           RecipeCreateSerializer,
@@ -25,7 +26,7 @@ from .serializers import (IngredientSerializer,
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    # permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAdminOrSuperuserOrReadOnly,)
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
@@ -34,6 +35,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAdminOrSuperuserOrReadOnly,)
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
@@ -42,6 +44,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    # permission_classes = (AllowAny,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     http_method_names = ['get', 'post', 'patch', 'delete', ]
@@ -61,6 +64,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 class FollowViewSet(viewsets.ViewSet):
+    permission_classes = (IsAuthorStaffOrReadOnly,)
     """Вьюсет для подписок."""
 
     @action(
@@ -84,7 +88,8 @@ class FollowViewSet(viewsets.ViewSet):
         serializer = AuthorSerializer(following, context={'request': request})
         return Response(serializer.data, status=HTTPStatus.CREATED)
 
-    @action(detail=True, methods=['DELETE'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['DELETE'],
+            permission_classes=(IsAuthorStaffOrReadOnly,))
     @transaction.atomic()
     def destroy(self, request, id=None):
         """Отписка"""
@@ -103,7 +108,7 @@ class FollowViewSet(viewsets.ViewSet):
         follow.delete()
         return Response(status=HTTPStatus.NO_CONTENT)
 
-    @action(detail=False, permission_classes=(IsAuthenticated,))
+    @action(detail=False, permission_classes=(IsAuthorStaffOrReadOnly,))
     def follows_list(self, request):
         """Подписки."""
         user = request.user
@@ -142,7 +147,10 @@ class FavoriteViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=HTTPStatus.CREATED, exception=True)
 
     @transaction.atomic()
-    def destroy(self, request, id=None):
+    @action(
+        methods=['POST'], detail=True, permission_classes=(IsAuthorStaffOrReadOnly,)
+    )
+    def destroy(self, request, id=None, ):
         """Удалить из избранного рецепт."""
         user = request.user
         try:
@@ -184,6 +192,9 @@ class ShoppingCartViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=HTTPStatus.CREATED, exception=True)
 
     @transaction.atomic()
+    @action(
+        methods=['POST'], detail=True, permission_classes=(IsAuthorStaffOrReadOnly,)
+    )
     def destroy(self, request, id=None):
         """Удалить из корзины рецепт."""
         user = request.user
@@ -203,7 +214,7 @@ class ShoppingCartViewSet(viewsets.ViewSet):
 
 @action(url_path='download_shopping_cart',
         detail=False,
-        permission_classes=(IsAuthenticated,))
+        permission_classes=(IsAuthorStaffOrReadOnly,))
 def download_shopping_cart(request):
     """Функция формирует список покупок"""
     user = request.user

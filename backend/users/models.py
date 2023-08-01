@@ -12,7 +12,7 @@ class User(AbstractUser):
     )
 
     email = models.EmailField('Электронная почта', max_length=254, unique=True)
-    role = models.CharField("Роль пользователя", max_length=25,
+    role = models.CharField('Роль пользователя', max_length=25,
                             choices=ROLE_CHOICES, default=USER)
 
     class Meta:
