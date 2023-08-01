@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -118,7 +117,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS':
         'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 6,
-    'SEARCH_PARAM': 'name'  # Используем по умолчанию в запросе name вместо search
+    'SEARCH_PARAM': 'name'
+    # Используем по умолчанию в запросе name вместо search
 }
 
 DJOSER = {

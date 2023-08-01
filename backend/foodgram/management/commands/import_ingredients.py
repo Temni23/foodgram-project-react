@@ -13,6 +13,8 @@ class Command(BaseCommand):
         with open(file_path, 'r', encoding='utf-8') as file:
             csv_reader = csv.DictReader(file)
             for row in csv_reader:
-                ingredient = Ingredient(name=row['абрикосовое варенье'], measurement_unit=row['г'])
+                ingredient = Ingredient(name=row['абрикосовое варенье'],
+                                        measurement_unit=row['г'])
                 ingredient.save()
-        self.stdout.write(self.style.SUCCESS('Ingredient imported successfully'))
+        self.stdout.write(
+            self.style.SUCCESS('Ingredient imported successfully'))

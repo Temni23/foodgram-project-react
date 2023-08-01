@@ -39,14 +39,17 @@ class Tag(models.Model):
 
 class Recipe(models.Model):
     tags = models.ManyToManyField(Tag, related_name='tags', )
-    author = models.ForeignKey(User, related_name='recipes', on_delete=models.CASCADE,
+    author = models.ForeignKey(User, related_name='recipes',
+                               on_delete=models.CASCADE,
                                verbose_name='Автор')
-    ingredients = models.ManyToManyField(Ingredient, through='RecipeIngredient',
+    ingredients = models.ManyToManyField(Ingredient,
+                                         through='RecipeIngredient',
                                          related_name='ingredients')
     name = models.CharField('Название рецепта', max_length=200)
     image = models.ImageField('Изображение', upload_to='recipes/images/', )
     text = models.TextField(verbose_name='Описание рецепта')
-    cooking_time = models.PositiveIntegerField(verbose_name='Время приготовления', )
+    cooking_time = models.PositiveIntegerField(
+        verbose_name='Время приготовления', )
     pub_date = models.DateTimeField('Дата создания рецепта', auto_now_add=True)
 
     class Meta:

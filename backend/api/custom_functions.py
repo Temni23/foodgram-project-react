@@ -5,11 +5,14 @@ from rest_framework.generics import get_object_or_404
 from foodgram.models import RecipeIngredient, Ingredient, Recipe
 
 
-def add_ingredients(new_ingredients: List[Ingredient], instance: Recipe) -> None:
-    """Используется в сериализаторе создания рецепта. Добавляет ингредиенты в рецепт."""
+def add_ingredients(new_ingredients: List[Ingredient],
+                    instance: Recipe) -> None:
+    """Используется в сериализаторе создания рецепта.
+    Добавляет ингредиенты в рецепт."""
     new_recipe_ingredients = []
     for ingredient_data in new_ingredients:
-        ingredient = get_object_or_404(Ingredient, id=ingredient_data.get('id'))
+        ingredient = get_object_or_404(Ingredient,
+                                       id=ingredient_data.get('id'))
         recipe_ingredient = RecipeIngredient(
             recipe=instance,
             ingredient=ingredient,

@@ -28,7 +28,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
-            'email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed')
+            'email', 'id', 'username', 'first_name', 'last_name',
+            'is_subscribed')
         model = User
 
     def get_is_subscribed(self, obj):
@@ -49,7 +50,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
                                              r'^[\w.@+-]+\Z')
                                      ))
     email = serializers.EmailField(max_length=254, required=True)
-    password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    password = serializers.CharField(style={'input_type': 'password'},
+                                     write_only=True)
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -100,7 +102,8 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
     """Сериалайзер для связанной модели рецепта и ингредиента"""
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.CharField(source='ingredient.name')
-    measurement_unit = serializers.CharField(source='ingredient.measurement_unit')
+    measurement_unit = serializers.CharField(
+        source='ingredient.measurement_unit')
 
     class Meta:
         fields = ('id', 'name', 'measurement_unit', 'amount')
@@ -112,7 +115,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     image = Base64ImageField(required=True, allow_null=False)
     author = UserSerializer()
-    ingredients = RecipeIngredientSerializer(many=True, source='recipe_ingredients')
+    ingredients = RecipeIngredientSerializer(many=True,
+                                             source='recipe_ingredients')
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -174,7 +178,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         serializer = RecipeSerializer(instance,
-                                      context={'request': self.context.get('request')})
+                                      context={'request': self.context.get(
+                                          'request')})
         return serializer.data
 
 
@@ -244,7 +249,8 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'id', 'first_name', 'last_name', 'is_subscribed', 'recipes',
+        fields = ['email', 'id', 'first_name', 'last_name', 'is_subscribed',
+                  'recipes',
                   'recipes_count']
 
     def get_recipes_count(self, obj):

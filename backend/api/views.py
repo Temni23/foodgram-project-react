@@ -50,8 +50,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', ]
 
     def get_queryset(self):
-        queryset = Recipe.objects.prefetch_related('recipe_ingredients__ingredient',
-                                                   'tags').all()
+        queryset = Recipe.objects.prefetch_related(
+            'recipe_ingredients__ingredient',
+            'tags').all()
         return queryset
 
     def get_serializer_class(self):
@@ -143,12 +144,15 @@ class FavoriteViewSet(viewsets.ViewSet):
                 'Рецепт уже в избранном'
             )
         FavoriteRecipe.objects.create(user=user, recipe=recipe)
-        serializer = RecipeShortSerializer(recipe, context={'request': request})
-        return Response(serializer.data, status=HTTPStatus.CREATED, exception=True)
+        serializer = RecipeShortSerializer(recipe,
+                                           context={'request': request})
+        return Response(serializer.data, status=HTTPStatus.CREATED,
+                        exception=True)
 
     @transaction.atomic()
     @action(
-        methods=['POST'], detail=True, permission_classes=(IsAuthorStaffOrReadOnly,)
+        methods=['POST'], detail=True,
+        permission_classes=(IsAuthorStaffOrReadOnly,)
     )
     def destroy(self, request, id=None, ):
         """Удалить из избранного рецепт."""
@@ -159,7 +163,8 @@ class FavoriteViewSet(viewsets.ViewSet):
             raise serializers.ValidationError(
                 'Рецепта не существует'
             )
-        if not FavoriteRecipe.objects.filter(user=user, recipe=recipe).exists():
+        if not FavoriteRecipe.objects.filter(user=user,
+                                             recipe=recipe).exists():
             raise serializers.ValidationError(
                 'Рецепт не добавлен в избранное'
             )
@@ -188,12 +193,15 @@ class ShoppingCartViewSet(viewsets.ViewSet):
                 'Рецепт уже в корзине'
             )
         ShoppingCart.objects.create(user=user, recipe=recipe)
-        serializer = RecipeShortSerializer(recipe, context={'request': request})
-        return Response(serializer.data, status=HTTPStatus.CREATED, exception=True)
+        serializer = RecipeShortSerializer(recipe,
+                                           context={'request': request})
+        return Response(serializer.data, status=HTTPStatus.CREATED,
+                        exception=True)
 
     @transaction.atomic()
     @action(
-        methods=['POST'], detail=True, permission_classes=(IsAuthorStaffOrReadOnly,)
+        methods=['POST'], detail=True,
+        permission_classes=(IsAuthorStaffOrReadOnly,)
     )
     def destroy(self, request, id=None):
         """Удалить из корзины рецепт."""
@@ -219,10 +227,12 @@ def download_shopping_cart(request):
     """Функция формирует список покупок"""
     user = request.user
     cart_recipes = user.cart_recipes.all()
-    recipes_names = ', '.join([cart_recipe.recipe.name for cart_recipe in cart_recipes])
-    ingredients_dict = (RecipeIngredient.objects.filter(recipe__recipe_cart__user=user)
-                        .values('ingredient__name', 'ingredient__measurement_unit').
-                        annotate(total_amount=Sum('amount')))
+    recipes_names = ', '.join(
+        [cart_recipe.recipe.name for cart_recipe in cart_recipes])
+    ingredients_dict = (
+        RecipeIngredient.objects.filter(recipe__recipe_cart__user=user)
+        .values('ingredient__name', 'ingredient__measurement_unit').
+        annotate(total_amount=Sum('amount')))
     ingredients_list = [
         (ingredient['ingredient__name'], str(ingredient['total_amount']),
          ingredient['ingredient__measurement_unit']) for
