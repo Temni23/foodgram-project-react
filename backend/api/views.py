@@ -22,7 +22,8 @@ from .serializers import (IngredientSerializer,
                           TagSerializer, RecipeSerializer,
                           RecipeCreateSerializer,
                           CheckFollowSerializer, AuthorSerializer,
-                          RecipeShortSerializer)
+                          RecipeShortSerializer, FavoriteSerializer,
+                          ShoppingCartSerializer)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -133,16 +134,17 @@ class FavoriteViewSet(viewsets.ViewSet):
     def create(self, request, id=None):
         """Добавить в избранное рецепт."""
         user = request.user
-        try:
-            recipe = Recipe.objects.get(pk=id)
-        except Recipe.DoesNotExist:
-            raise serializers.ValidationError(
-                'Рецепта не существует'
-            )
-        if FavoriteRecipe.objects.filter(user=user, recipe=recipe).exists():
-            raise serializers.ValidationError(
-                'Рецепт уже в избранном'
-            )
+        recipe = get_object_or_404(Recipe, id=id)
+        data = {
+            'user': user.id,
+            'recipe': recipe.id,
+        }
+        serializer = FavoriteSerializer(
+            data=data,
+            context={'request': request},
+        )
+        serializer.is_valid(raise_exception=True)
+
         FavoriteRecipe.objects.create(user=user, recipe=recipe)
         serializer = RecipeShortSerializer(recipe,
                                            context={'request': request})
@@ -158,13 +160,13 @@ class FavoriteViewSet(viewsets.ViewSet):
         """Удалить из избранного рецепт."""
         user = request.user
         try:
-            recipe = Recipe.objects.get(pk=id)
+            recipe = Recipe.objects.filter(pk=id).first()
         except Recipe.DoesNotExist:
             raise serializers.ValidationError(
                 'Рецепта не существует'
             )
         if not FavoriteRecipe.objects.filter(user=user,
-                                             recipe=recipe).exists():
+                                             recipe=recipe).first():
             raise serializers.ValidationError(
                 'Рецепт не добавлен в избранное'
             )
@@ -182,16 +184,17 @@ class ShoppingCartViewSet(viewsets.ViewSet):
     def create(self, request, id=None):
         """Добавить в корзину рецепт."""
         user = request.user
-        try:
-            recipe = Recipe.objects.get(pk=id)
-        except Recipe.DoesNotExist:
-            raise serializers.ValidationError(
-                'Рецепта не существует'
-            )
-        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
-            raise serializers.ValidationError(
-                'Рецепт уже в корзине'
-            )
+        recipe = get_object_or_404(Recipe, id=id)
+        data = {
+            'user': user.id,
+            'recipe': recipe.id,
+        }
+        serializer = ShoppingCartSerializer(
+            data=data,
+            context={'request': request},
+        )
+        serializer.is_valid(raise_exception=True)
+
         ShoppingCart.objects.create(user=user, recipe=recipe)
         serializer = RecipeShortSerializer(recipe,
                                            context={'request': request})
@@ -207,12 +210,12 @@ class ShoppingCartViewSet(viewsets.ViewSet):
         """Удалить из корзины рецепт."""
         user = request.user
         try:
-            recipe = Recipe.objects.get(pk=id)
+            recipe = Recipe.objects.filter(pk=id).first()
         except Recipe.DoesNotExist:
             raise serializers.ValidationError(
                 'Рецепта не существует'
             )
-        if not ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+        if not ShoppingCart.objects.filter(user=user, recipe=recipe).first():
             raise serializers.ValidationError(
                 'Рецепт не добавлен в корзину'
             )

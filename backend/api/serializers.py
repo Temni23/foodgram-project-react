@@ -9,7 +9,8 @@ from api.custom_functions import add_ingredients
 from backend.constants import (USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH,
                                COOKING_TIME_ANF_AMOUNT_MIN,
                                COOKING_TIME_ANF_AMOUNT_MAX)
-from foodgram.models import Ingredient, Tag, Recipe, RecipeIngredient, Follow
+from foodgram.models import Ingredient, Tag, Recipe, RecipeIngredient, Follow, \
+    FavoriteRecipe, ShoppingCart
 from users.models import User
 
 
@@ -276,3 +277,33 @@ class AuthorSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         user = self.context['request'].user
         return obj.following.filter(user=user).exists()
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FavoriteRecipe
+        fields = ('user', 'recipe')
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+        recipe = attrs['recipe']
+
+        if FavoriteRecipe.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError('Рецепт уже в избранном')
+
+        return attrs
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShoppingCart
+        fields = ('user', 'recipe')
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+        recipe = attrs['recipe']
+
+        if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError('Рецепт уже в корзине')
+
+        return attrs
