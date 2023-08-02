@@ -9,8 +9,8 @@ from api.custom_functions import add_ingredients
 from backend.constants import (USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH,
                                COOKING_TIME_ANF_AMOUNT_MIN,
                                COOKING_TIME_ANF_AMOUNT_MAX)
-from foodgram.models import Ingredient, Tag, Recipe, RecipeIngredient, Follow, \
-    FavoriteRecipe, ShoppingCart
+from foodgram.models import (Ingredient, Tag, Recipe, RecipeIngredient,
+                             Follow, FavoriteRecipe, ShoppingCart)
 from users.models import User
 
 
