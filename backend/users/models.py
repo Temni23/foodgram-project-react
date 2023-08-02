@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from backend.constants import EMAIL_MAX_LENGTH, USER_ROLE_MAX_LENGTH
+
 
 class User(AbstractUser):
     USER = 'user'
@@ -11,8 +13,10 @@ class User(AbstractUser):
         (ADMIN, 'Администратор'),
     )
 
-    email = models.EmailField('Электронная почта', max_length=254, unique=True)
-    role = models.CharField('Роль пользователя', max_length=25,
+    email = models.EmailField('Электронная почта', max_length=EMAIL_MAX_LENGTH,
+                              unique=True)
+    role = models.CharField('Роль пользователя',
+                            max_length=USER_ROLE_MAX_LENGTH,
                             choices=ROLE_CHOICES, default=USER)
 
     class Meta:

@@ -6,6 +6,9 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 from api.custom_functions import add_ingredients
+from backend.constants import (USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH,
+                               COOKING_TIME_ANF_AMOUNT_MIN,
+                               COOKING_TIME_ANF_AMOUNT_MAX)
 from foodgram.models import Ingredient, Tag, Recipe, RecipeIngredient, Follow
 from users.models import User
 
@@ -23,6 +26,7 @@ class Base64ImageField(serializers.ImageField):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Сериалайзер используется для работы с пользователями"""
     id = serializers.IntegerField(read_only=True)
     is_subscribed = serializers.SerializerMethodField()
 
@@ -43,13 +47,17 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(max_length=150, required=True,
+    """Сериалайзер используется для создания пользователя"""
+    username = serializers.CharField(max_length=USERNAME_MAX_LENGTH,
+                                     required=True,
                                      validators=(
-                                         validators.MaxLengthValidator(150),
+                                         validators.MaxLengthValidator(
+                                             USERNAME_MAX_LENGTH),
                                          validators.RegexValidator(
                                              r'^[\w.@+-]+\Z')
                                      ))
-    email = serializers.EmailField(max_length=254, required=True)
+    email = serializers.EmailField(max_length=EMAIL_MAX_LENGTH,
+                                   required=True)
     password = serializers.CharField(style={'input_type': 'password'},
                                      write_only=True)
     is_subscribed = serializers.SerializerMethodField()
@@ -61,18 +69,17 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         user = User.objects.filter(email=attrs.get('email'))
-        if user.exists():
+        if user:
             user = user.first()
             if user.username != attrs.get('username'):
                 raise serializers.ValidationError(
-                    {'Это имя пользователя уже используется'}
+                    {'Этот email уже используется другим пользователем'}
                 )
-        user = User.objects.filter(username=attrs.get('username'))
-        if user.exists():
-            user = user.first()
+        user = User.objects.filter(username=attrs.get('username')).first()
+        if user:
             if user.email != attrs.get('email'):
                 raise serializers.ValidationError(
-                    {'Этот email уже используется другим пользователем'}
+                    {'Это имя пользователя уже используется'}
                 )
         if attrs.get('password'):
             attrs['password'] = make_password(attrs['password'])
@@ -104,6 +111,8 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='ingredient.name')
     measurement_unit = serializers.CharField(
         source='ingredient.measurement_unit')
+    amount = serializers.IntegerField(min_value=COOKING_TIME_ANF_AMOUNT_MIN,
+                                      max_value=COOKING_TIME_ANF_AMOUNT_MAX)
 
     class Meta:
         fields = ('id', 'name', 'measurement_unit', 'amount')
@@ -119,6 +128,9 @@ class RecipeSerializer(serializers.ModelSerializer):
                                              source='recipe_ingredients')
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
+    cooking_time = serializers.IntegerField(
+        min_value=COOKING_TIME_ANF_AMOUNT_MIN,
+        max_value=COOKING_TIME_ANF_AMOUNT_MAX)
 
     class Meta:
         fields = (

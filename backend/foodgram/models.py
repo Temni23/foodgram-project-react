@@ -2,13 +2,16 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
+from backend.constants import CHARFIELD_MAX_LENGTH, COLOR_MAX_LENGTH, \
+    COOKING_TIME_ANF_AMOUNT_MIN, COOKING_TIME_ANF_AMOUNT_MAX
+
 User = get_user_model()
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=200,
+    name = models.CharField(max_length=CHARFIELD_MAX_LENGTH,
                             verbose_name='Название ингредиента')
-    measurement_unit = models.CharField(max_length=200,
+    measurement_unit = models.CharField(max_length=CHARFIELD_MAX_LENGTH,
                                         verbose_name='Единица измерения')
 
     class Meta:
@@ -25,9 +28,12 @@ class Ingredient(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField('Название тэга', max_length=200)
-    color = models.CharField('Цвет тэга', max_length=7, null=True)
-    slug = models.SlugField('Слаг тэга', max_length=200, unique=True)
+    name = models.CharField('Название тэга',
+                            max_length=CHARFIELD_MAX_LENGTH)
+    color = models.CharField('Цвет тэга', max_length=COLOR_MAX_LENGTH,
+                             null=True)
+    slug = models.SlugField('Слаг тэга',
+                            max_length=CHARFIELD_MAX_LENGTH, unique=True)
 
     class Meta:
         ordering = ['-name']
@@ -46,12 +52,14 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(Ingredient,
                                          through='RecipeIngredient',
                                          related_name='ingredients')
-    name = models.CharField('Название рецепта', max_length=200)
+    name = models.CharField('Название рецепта',
+                            max_length=CHARFIELD_MAX_LENGTH)
     image = models.ImageField('Изображение', upload_to='recipes/images/', )
     text = models.TextField(verbose_name='Описание рецепта')
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
-        validators=[MinValueValidator(1), MaxValueValidator(32000)])
+        validators=[MinValueValidator(COOKING_TIME_ANF_AMOUNT_MIN),
+                    MaxValueValidator(COOKING_TIME_ANF_AMOUNT_MAX)])
     pub_date = models.DateTimeField('Дата создания рецепта', auto_now_add=True)
 
     class Meta:
@@ -78,8 +86,9 @@ class RecipeIngredient(models.Model):
                                on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     amount = models.PositiveSmallIntegerField(
-        verbose_name='Количество', validators=[MinValueValidator(1),
-                                               MaxValueValidator(32000)])
+        verbose_name='Количество',
+        validators=[MinValueValidator(COOKING_TIME_ANF_AMOUNT_MIN),
+                    MaxValueValidator(COOKING_TIME_ANF_AMOUNT_MAX)])
 
     class Meta:
         ordering = ['id']
