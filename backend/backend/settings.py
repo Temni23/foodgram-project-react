@@ -11,6 +11,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'key_for_default')
 
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
+
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split()
 
 AUTH_USER_MODEL = 'users.User'
