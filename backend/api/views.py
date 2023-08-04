@@ -45,7 +45,6 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    # permission_classes = (AllowAny,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     http_method_names = ['get', 'post', 'patch', 'delete', ]
@@ -60,6 +59,34 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.action in ('create', 'partial_update'):
             return RecipeCreateSerializer
         return RecipeSerializer
+
+    @action(url_path='download_shopping_cart',
+            detail=False,
+            permission_classes=(IsAuthorStaffOrReadOnly,))
+    def download_shopping_cart(self, request):
+        """Функция формирует список покупок"""
+        user = request.user
+        cart_recipes = user.cart_recipes.all()
+        recipes_names = ', '.join(
+            [cart_recipe.recipe.name for cart_recipe in cart_recipes])
+        ingredients_dict = (
+            RecipeIngredient.objects.filter(recipe__recipe_cart__user=user)
+            .values('ingredient__name', 'ingredient__measurement_unit').
+            annotate(total_amount=Sum('amount')))
+        ingredients_list = [
+            (ingredient['ingredient__name'], str(ingredient['total_amount']),
+             ingredient['ingredient__measurement_unit']) for
+            ingredient in ingredients_dict]
+        shoping_list = (f'Список покупок пользователя {user}: \n'
+                        f'Для приготовления блюд: {recipes_names}, '
+                        f'возьмите эти ингредиенты:\n')
+        for ingredient in ingredients_list:
+            shoping_list += f'{" ".join(ingredient)}\n'
+        shoping_list += f'\nВаш любимый сайт с рецептами\n{datetime.date.today()}'
+        filename = 'shoping-list.txt'
+        response = HttpResponse(shoping_list, content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        return response
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -223,30 +250,4 @@ class ShoppingCartViewSet(viewsets.ViewSet):
         return Response(status=HTTPStatus.NO_CONTENT, exception=True)
 
 
-@action(url_path='download_shopping_cart',
-        detail=False,
-        permission_classes=(IsAuthorStaffOrReadOnly,))
-def download_shopping_cart(request):
-    """Функция формирует список покупок"""
-    user = request.user
-    cart_recipes = user.cart_recipes.all()
-    recipes_names = ', '.join(
-        [cart_recipe.recipe.name for cart_recipe in cart_recipes])
-    ingredients_dict = (
-        RecipeIngredient.objects.filter(recipe__recipe_cart__user=user)
-        .values('ingredient__name', 'ingredient__measurement_unit').
-        annotate(total_amount=Sum('amount')))
-    ingredients_list = [
-        (ingredient['ingredient__name'], str(ingredient['total_amount']),
-         ingredient['ingredient__measurement_unit']) for
-        ingredient in ingredients_dict]
-    shoping_list = (f'Список покупок пользователя {user}: \n'
-                    f'Для приготовления блюд: {recipes_names}, '
-                    f'возьмите эти ингредиенты:\n')
-    for ingredient in ingredients_list:
-        shoping_list += f'{" ".join(ingredient)}\n'
-    shoping_list += f'\nВаш любимый сайт с рецептами\n{datetime.date.today()}'
-    filename = 'shoping-list.txt'
-    response = HttpResponse(shoping_list, content_type='text/plain')
-    response['Content-Disposition'] = f'attachment; filename={filename}'
-    return response
+

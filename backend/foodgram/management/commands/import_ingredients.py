@@ -9,7 +9,7 @@ class Command(BaseCommand):
     help = 'Import ingredients from CSV file'
 
     def handle(self, *args, **options):
-        file_path = '../data/ingredients.csv'
+        file_path = 'data/ingredients.csv'
         with open(file_path, 'r', encoding='utf-8') as file:
             csv_reader = csv.DictReader(file)
             for row in csv_reader:
