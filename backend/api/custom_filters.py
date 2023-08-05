@@ -23,4 +23,3 @@ class RecipeFilter(FilterSet):
         if value:
             return queryset.filter(recipe_favorites__user=self.request.user)
         return queryset
-

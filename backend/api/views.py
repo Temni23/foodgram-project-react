@@ -248,6 +248,3 @@ class ShoppingCartViewSet(viewsets.ViewSet):
             )
         ShoppingCart.objects.filter(user=user, recipe=recipe).delete()
         return Response(status=HTTPStatus.NO_CONTENT, exception=True)
-
-
-
