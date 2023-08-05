@@ -9,7 +9,7 @@
 В данном проекте реализована мини соцсеть для обмена рецептами между пользователями
 
 ## Технологии
-Python 3.11.1, Django 4.1, Django REST framework, React, Docker, Nginx
+Python 3.9, Django 3.2.16, Django REST framework 3.12.4, React, Docker, Nginx
 
 ## Запуск проекта на локальном компьютере
 
