@@ -15,7 +15,7 @@ from users.models import User
 
 
 class Base64ImageField(serializers.ImageField):
-    """Сериалайзер используется для изображений"""
+    """Сериалайзер используется для изображений."""
 
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
@@ -27,7 +27,7 @@ class Base64ImageField(serializers.ImageField):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Сериалайзер используется для работы с пользователями"""
+    """Сериалайзер используется для работы с пользователями."""
     id = serializers.IntegerField(read_only=True)
     is_subscribed = serializers.SerializerMethodField()
 
@@ -48,7 +48,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    """Сериалайзер используется для создания пользователя"""
+    """Сериалайзер используется для создания пользователя."""
     username = serializers.CharField(max_length=USERNAME_MAX_LENGTH,
                                      required=True,
                                      validators=(
