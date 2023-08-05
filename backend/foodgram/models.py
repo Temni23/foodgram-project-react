@@ -2,8 +2,9 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from backend.constants import CHARFIELD_MAX_LENGTH, COLOR_MAX_LENGTH, \
-    COOKING_TIME_ANF_AMOUNT_MIN, COOKING_TIME_ANF_AMOUNT_MAX
+from backend.constants import (CHARFIELD_MAX_LENGTH, COLOR_MAX_LENGTH,
+                               COOKING_TIME_ANF_AMOUNT_MIN,
+                               COOKING_TIME_ANF_AMOUNT_MAX)
 
 User = get_user_model()
 

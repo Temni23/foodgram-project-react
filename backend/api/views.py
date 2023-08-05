@@ -12,7 +12,6 @@ from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
 from api.custom_filters import RecipeFilter
 from foodgram.models import (Ingredient, Tag, Recipe, Follow, FavoriteRecipe,
                              ShoppingCart, RecipeIngredient)
@@ -82,7 +81,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                         f'возьмите эти ингредиенты:\n')
         for ingredient in ingredients_list:
             shoping_list += f'{" ".join(ingredient)}\n'
-        shoping_list += f'\nВаш любимый сайт с рецептами\n{datetime.date.today()}'
+        shoping_list += (f'\nВаш любимый сайт с рецептами\n'
+                         f'{datetime.date.today()}')
         filename = 'shoping-list.txt'
         response = HttpResponse(shoping_list, content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename={filename}'

@@ -1,7 +1,5 @@
 import django_filters
-from django_filters import FilterSet, filters
-from django_filters.widgets import BooleanWidget
-
+from django_filters import FilterSet, filters, widgets
 from foodgram.models import Recipe, Tag
 
 
@@ -12,7 +10,7 @@ class RecipeFilter(FilterSet):
         queryset=Tag.objects.all(),
     )
     is_favorited = filters.BooleanFilter(
-        widget=BooleanWidget(),
+        widget=widgets.BooleanWidget(),
         method='filter_is_favorited')
 
     class Meta:

@@ -1,7 +1,6 @@
 from typing import List
 
 from rest_framework.generics import get_object_or_404
-
 from foodgram.models import RecipeIngredient, Ingredient, Recipe
 
 
