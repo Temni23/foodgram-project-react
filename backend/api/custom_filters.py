@@ -1,6 +1,7 @@
 import django_filters
 from django_filters import FilterSet, filters, widgets
-from foodgram.models import Recipe, Tag
+
+from foodgram.models import Recipe, Tag, User
 
 
 class RecipeFilter(FilterSet):
@@ -15,10 +16,12 @@ class RecipeFilter(FilterSet):
     is_in_shopping_cart = filters.BooleanFilter(
         widget=widgets.BooleanWidget(),
         method='filter_is_in_shopping_cart')
+    author = filters.ModelChoiceFilter(queryset=User.objects.all())
 
     class Meta:
         model = Recipe
-        fields = ['tags__slug', 'is_favorited', 'is_in_shopping_cart']
+        fields = ['tags__slug', 'is_favorited', 'is_in_shopping_cart',
+                  'author']
 
     def filter_is_favorited(self, queryset, name, value):
         if value:

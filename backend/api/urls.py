@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (IngredientViewSet, TagViewSet, RecipeViewSet,
                     FollowViewSet, FavoriteViewSet, ShoppingCartViewSet,
+                    UserRetrieveViewSet,
                     )
 
 app_name = 'api'
@@ -28,6 +29,8 @@ urlpatterns = [
          ShoppingCartViewSet.as_view({'post': 'create', 'delete': 'destroy'
                                       }), name='shopping_cart'),
     path('auth/', include('djoser.urls.authtoken')),
+    path('users/<int:pk>/',
+         UserRetrieveViewSet.as_view({'get': 'retrieve'})),
     path('', include('djoser.urls')),
     path('', include(router.urls)),
 

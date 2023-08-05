@@ -9,9 +9,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, serializers
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
+from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
+
 from api.custom_filters import RecipeFilter
 from foodgram.models import (Ingredient, Tag, Recipe, Follow, FavoriteRecipe,
                              ShoppingCart, RecipeIngredient)
@@ -23,6 +26,12 @@ from .serializers import (IngredientSerializer,
                           CheckFollowSerializer, AuthorSerializer,
                           RecipeShortSerializer, FavoriteSerializer,
                           ShoppingCartSerializer)
+
+
+class UserRetrieveViewSet(RetrieveModelMixin, GenericViewSet):
+    queryset = User.objects.all()
+    serializer_class = AuthorSerializer
+    permission_classes = (IsAuthenticated, )
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
