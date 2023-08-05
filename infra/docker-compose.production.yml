@@ -13,7 +13,7 @@ services:
       - pg_data:/var/lib/postgresql/data
     restart: always
   backend:
-    build: ../backend/
+    image: pytem/foodgram_backend
     env_file: .env
     volumes:
       - backend_static:/backend_static
@@ -22,11 +22,11 @@ services:
       - db
     restart: on-failure
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: pytem/foodgram_frontend
     volumes:
       - ../frontend/:/app/result_build/
+    depends_on:
+      - backend
   nginx:
     image: nginx:1.19.3
     ports:
