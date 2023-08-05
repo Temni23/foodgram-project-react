@@ -4,13 +4,13 @@ from django.contrib.auth.hashers import make_password
 from django.core import validators
 from django.core.files.base import ContentFile
 from rest_framework import serializers
+
 from api.custom_functions import add_ingredients
 from backend.constants import (USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH,
                                COOKING_TIME_ANF_AMOUNT_MIN,
                                COOKING_TIME_ANF_AMOUNT_MAX)
 from foodgram.models import (Ingredient, Tag, Recipe, RecipeIngredient,
                              Follow, FavoriteRecipe, ShoppingCart)
-
 from users.models import User
 
 
@@ -157,7 +157,8 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
     """Сериалайзер используется для создания и
     обновления ингредиентов в рецепте"""
     id = serializers.IntegerField()
-    amount = serializers.IntegerField()
+    amount = serializers.IntegerField(min_value=COOKING_TIME_ANF_AMOUNT_MIN,
+                                      max_value=COOKING_TIME_ANF_AMOUNT_MAX)
 
     class Meta:
         model = RecipeIngredient
@@ -168,6 +169,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериалайзер используется для создания и обновления рецептов"""
     image = Base64ImageField(required=True, allow_null=False)
     ingredients = RecipeIngredientCreateSerializer(many=True)
+    cooking_time = serializers.IntegerField(
+        min_value=COOKING_TIME_ANF_AMOUNT_MIN,
+        max_value=COOKING_TIME_ANF_AMOUNT_MAX)
 
     class Meta:
         fields = ('tags', 'ingredients', 'name', 'image', 'text',

@@ -31,7 +31,7 @@ from .serializers import (IngredientSerializer,
 class UserRetrieveViewSet(RetrieveModelMixin, GenericViewSet):
     queryset = User.objects.all()
     serializer_class = AuthorSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
