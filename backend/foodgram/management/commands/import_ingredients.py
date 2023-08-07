@@ -1,12 +1,12 @@
 import csv
 
 from django.core.management.base import BaseCommand
+
 from foodgram.models import Ingredient
 
 
 class Command(BaseCommand):
     help = 'Import ingredients from CSV file'
-
 
     def handle(self, *args, **options):
         ingredients_list = []
