@@ -1,6 +1,4 @@
-### Адрес сервера: [Кликнуть по ссылке](https://foodgram-klimov.ddns.net/)
-### Логин администратора: superuser
-### Пароль администратора: superuser
+###  [Работающий демонстрационный сервер с сайтом](https://foodgram-klimov.ddns.net/)
 
 #  Foodgram
 
